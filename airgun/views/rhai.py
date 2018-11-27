@@ -39,6 +39,20 @@ class InventoryHostDetails(BaseLoggedInView):
     hostname = Text(".//div[@class='modal-title']/h2/div/span")
     close = Text(".//div[contains(@class, 'fa-close'])")
 
+    @ParametrizedView.nested
+    class rules(ParametrizedView):
+        PARAMETERS = ("title",)
+        ROOT = ParametrizedLocator(
+            ".//div[@rule-id='rule_id'][//h3[@class='title' and text()=\"{title}\"]]"
+        )
+        ALL_RULES = "//div[@rule-id='rule_id']//h3[@class='title']"
+
+        title = Text(".//h3[@class='title']")
+
+        @classmethod
+        def all(cls, browser):
+            return [(element.text,) for element in browser.elements(cls.ALL_RULES)]
+
     @property
     def is_displayed(self):
         return self.hostname.is_displayed and self.close.is_displayed

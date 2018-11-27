@@ -1,6 +1,7 @@
 from airgun.entities.base import BaseEntity
 from airgun.navigation import NavigateStep, navigator
 from airgun.views.rhai import InventoryAllHosts, InventoryHostDetails
+from wait_for import wait_for
 
 
 class InventoryHostEntity(BaseEntity):
@@ -16,6 +17,11 @@ class InventoryHostEntity(BaseEntity):
         view = self.navigate_to(self, "All")
         view.search.fill(host_name)
         return view.table
+
+    def read(self, entity_name):
+        view = self.navigate_to(self, "Details", entity_name=entity_name)
+        wait_for(lambda: bool(view.read()['rules']) is True)
+        return view.read()
 
 
 @navigator.register(InventoryHostEntity, "All")
